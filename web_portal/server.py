@@ -11,9 +11,24 @@ def server_static(filepath):
 
 
 @route('/', method='GET')
-def get():
+def index():
+    return home_page('recommender')
+
+
+@route('/recommender', method='GET')
+def index():
+    return home_page('recommender')
+
+
+@route('/watcher', method='GET')
+def index():
+    return home_page('watcher')
+
+
+def home_page(tab):
     return template(
-        os.path.dirname(__file__) + '/templates/index.tpl'
+        os.path.dirname(__file__) + '/templates/index.tpl',
+        tab=tab
     )
 
 
