@@ -3,6 +3,8 @@ import os
 
 from bottle import run, route, request, template, static_file
 
+from stock_advisor.web_portal import tabs
+
 
 @route('/static/<filepath:path>')
 def server_static(filepath):
@@ -12,23 +14,21 @@ def server_static(filepath):
 
 @route('/', method='GET')
 def index():
-    return home_page('recommender')
-
-
-@route('/recommender', method='GET')
-def index():
-    return home_page('recommender')
-
-
-@route('/watcher', method='GET')
-def index():
     return home_page('watcher')
 
 
-def home_page(tab):
+@route('/<selected_tab>', method='GET')
+def index(selected_tab):
+    return home_page(selected_tab)
+
+
+def home_page(selected_tab):
+    rendered_tabs, rendered_cards = tabs.process_tab(selected_tab)
+
     return template(
         os.path.dirname(__file__) + '/templates/index.tpl',
-        tab=tab
+        tabs=rendered_tabs,
+        cards=rendered_cards,
     )
 
 
