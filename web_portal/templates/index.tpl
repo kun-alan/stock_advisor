@@ -34,6 +34,12 @@
             .color-even {
                 color: black;
             }
+            a.symbol-link {
+                color: #ffffff;
+                font-size: 24px;
+                font-weight: 300;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
