@@ -44,20 +44,11 @@
     </head>
     <body>
         <div>
-            <div class="mdl-tabs mdl-js-tabs">
-                <div class="mdl-tabs__tab-bar">
-                    % for tab in tabs:
-{{!tab}}
-                    % end
-                </div>
-
+            <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+                {{!tabs}}
                 <div class="mdl-tabs__panel is-active" id="watcher">
                     <div class="mdl-grid">
-                        % for card in cards:
-                            <div>
-{{!card}}
-                            </div>
-                        % end
+                        {{!payload}}
                     </div>
                 </div>
             </div>

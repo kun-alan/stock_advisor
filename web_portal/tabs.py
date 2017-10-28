@@ -2,50 +2,107 @@ import os
 
 from bottle import template
 
-from stock_advisor.web_portal import cards
+from stock_watcher import processor as watcher_processor
+# from stock_recommender import processor as recommender_processor
 
 
-def process_tab(selected_tab):
-    tabs = [
-        cards.KwargsObj(
-            text='Watcher',
-            href='watcher',
-            processor=process_watcher
-        ),
-        cards.KwargsObj(
-            text='Recommender',
-            href='recommender',
-            processor=process_recommender
-        ),
-    ]
+class KwargsObj():
+    def __init__(self, **kwargs):
+        self.__dict__ = kwargs
 
-    process_and_render_cards = None
-    for tab in tabs:
-        if tab.href == selected_tab:
-            tab.active = ' is-active'
-            process_and_render_cards = tab.processor
+
+def dicts_to_kwargs_objs(dicts):
+    return [KwargsObj(**data) for data in dicts]
+
+
+tabs = {
+    'watcher': {
+        'text': 'Watcher',
+        'subtabs': {
+            'event_cards': {
+                'text': 'Evt',
+                'processor': watcher_processor.event,
+                'type': 'card-3'
+            },
+            'table': {
+                'text': 'Table',
+                'processor': watcher_processor.event,
+                'type': 'table-3',
+            },
+        },
+    },
+    'recommender': {
+        'text': 'Recommender',
+        'subtabs': {
+            'card': {
+                'text': 'Card',
+                'processor': watcher_processor.event,
+                'type': 'card-3'
+            },
+            'table': {
+                'text': 'Table',
+                'processor': watcher_processor.event,
+                'type': 'table-3',
+            },
+        },
+    },
+}
+
+
+def process_tab(selected_tab, selected_subtab):
+
+    tabs_to_render = []
+    subtabs_to_render = []
+
+    processor = None
+    for tab, tab_dict in tabs.items():
+        tab_to_render = {
+            'href': tab,
+            'text': tab_dict['text'],
+        }
+
+        if tab == selected_tab:
+            tab_to_render['active'] = ' is-active'
+
+            for subtab, subtab_dict in tab_dict['subtabs'].items():
+                subtab_to_render = {
+                    'href': subtab,
+                    'text': subtab_dict['text'],
+                }
+                if subtab == selected_subtab:
+                    subtab_to_render['active'] = ' is-active'
+                    processor = subtab_dict['processor']
+                else:
+                    subtab_to_render['active'] = ''
+                subtabs_to_render.append(subtab_to_render)
+
         else:
-            tab.active = ''
+            tab_to_render['active'] = ''
 
-    return render_tabs(tabs), process_and_render_cards()
+        tabs_to_render.append(tab_to_render)
 
+    rendered_tabs = render_tabs(
+        dicts_to_kwargs_objs(tabs_to_render),
+        dicts_to_kwargs_objs(subtabs_to_render)
+    )
+    rendered_payload = render_payload(processor)
 
-def process_watcher():
-    fake_cards = cards.fake_cards()
-    return cards.render_stock_cards(fake_cards)
-
-
-def process_recommender():
-    fake_cards = cards.fake_cards()
-    fake_cards = fake_cards[-1:] + fake_cards[:-1]
-    return cards.render_stock_cards(fake_cards)
+    return rendered_tabs, rendered_payload
 
 
-def render_tabs(tabs):
-    return [
-        template(
-            os.path.dirname(__file__) + '/templates/tab.tpl',
-            tab=tab
-        )
-        for tab in tabs
-    ]
+def render_tabs(tabs_to_render, subtabs_to_render):
+    return template(
+        os.path.dirname(__file__) + '/templates/tab.tpl',
+        tabs=tabs_to_render,
+        subtabs=subtabs_to_render
+    )
+
+
+def render_payload(processor):
+    payload_data = dicts_to_kwargs_objs(processor())
+    template_file = 'stock_card.tpl'
+
+    return template(
+        os.path.dirname(__file__) + '/templates/' + template_file,
+        data=payload_data,
+    )

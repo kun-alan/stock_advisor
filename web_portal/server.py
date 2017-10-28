@@ -14,21 +14,22 @@ def server_static(filepath):
 
 @route('/', method='GET')
 def index():
-    return home_page('watcher')
+    return home_page('watcher', 'event_cards')
 
 
-@route('/<selected_tab>', method='GET')
-def index(selected_tab):
-    return home_page(selected_tab)
+@route('/selected_tab>/<selected_subtab>', method='GET')
+def index(selected_tab, selected_subtab):
+    return home_page(selected_tab, selected_subtab)
 
 
-def home_page(selected_tab):
-    rendered_tabs, rendered_cards = tabs.process_tab(selected_tab)
+def home_page(selected_tab, selected_subtab):
+    rendered_tabs, rendered_payload = tabs.process_tab(
+        selected_tab, selected_subtab)
 
     return template(
         os.path.dirname(__file__) + '/templates/index.tpl',
         tabs=rendered_tabs,
-        cards=rendered_cards,
+        payload=rendered_payload,
     )
 
 
