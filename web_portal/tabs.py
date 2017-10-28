@@ -92,7 +92,7 @@ def process_tab(selected_tab, selected_subtab):
 
 def render_tabs(tabs_to_render, subtabs_to_render):
     return template(
-        os.path.dirname(__file__) + '/templates/tab.tpl',
+        os.path.dirname(__file__) + '/templates/tabs.tpl',
         tabs=tabs_to_render,
         subtabs=subtabs_to_render
     )
@@ -100,7 +100,7 @@ def render_tabs(tabs_to_render, subtabs_to_render):
 
 def render_payload(processor):
     payload_data = dicts_to_kwargs_objs(processor())
-    template_file = 'stock_card.tpl'
+    template_file = 'stock_cards.tpl'
 
     return template(
         os.path.dirname(__file__) + '/templates/' + template_file,
