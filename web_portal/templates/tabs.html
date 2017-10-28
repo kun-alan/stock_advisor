@@ -1,0 +1,16 @@
+<div class="my-dropdown">
+    {% for tab in tabs %}
+        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+            <input class="mdl-textfield__input" id="{{ tab.id }}" name="{{ tab.id }}" value="{{ tab.current }}" type="text" readonly tabIndex="-1" data-val="BLR"/>
+            <label class="mdl-textfield__label" for="{{ tab.id }}">{{ tab.text }}</label>
+            <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="{{ tab.id }}">
+                {% for subtab in tab.subtabs %}
+                    <li class="mdl-menu__item" data-val="RUS">
+                        <a href="{{ subtab.href }}" class="subtab-link">{{ subtab.text }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+

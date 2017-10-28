@@ -1,9 +1,9 @@
 import os
 
-from bottle import template
+from flask import render_template
 
 from stock_watcher import processor as watcher_processor
-# from stock_recommender import processor as recommender_processor
+from stock_recommender import processor as recommender_processor
 
 
 class KwargsObj():
@@ -20,14 +20,14 @@ tabs = {
         'text': 'Watcher',
         'subtabs': {
             'event_cards': {
-                'text': 'Evt',
+                'text': 'Event',
                 'processor': watcher_processor.event,
-                'type': 'card-3'
+                'template': 'watcher_cards'
             },
             'history': {
-                'text': 'Hst',
+                'text': 'History',
                 'processor': watcher_processor.history,
-                'type': 'card-3',
+                'template': 'watcher_cards'
             },
         },
     },
@@ -35,14 +35,14 @@ tabs = {
         'text': 'Recommender',
         'subtabs': {
             'card': {
-                'text': 'Card',
-                'processor': watcher_processor.event,
-                'type': 'card-3'
+                'text': 'Bollinger',
+                'processor': recommender_processor.bollinger,
+                'template': 'recommender_table'
             },
             'table': {
-                'text': 'Table',
-                'processor': watcher_processor.event,
-                'type': 'table-3',
+                'text': 'Volatility',
+                'processor': recommender_processor.volatility,
+                'template': 'recommender_table'
             },
         },
     },
@@ -55,54 +55,43 @@ def process_tab(selected_tab, selected_subtab):
     subtabs_to_render = []
 
     processor = None
+    template = None
     for tab, tab_dict in tabs.items():
         tab_to_render = {
-            'href': tab,
+            'id': tab,
             'text': tab_dict['text'],
+            'current': ' ',
         }
 
-        if tab == selected_tab:
-            tab_to_render['active'] = ' is-active'
+        subtabs_to_render = []
 
-            for subtab, subtab_dict in tab_dict['subtabs'].items():
-                subtab_to_render = {
-                    'href': '/{}/{}'.format(tab, subtab),
-                    'text': subtab_dict['text'],
-                }
-                if subtab == selected_subtab:
-                    subtab_to_render['active'] = ' is-active'
-                    processor = subtab_dict['processor']
-                else:
-                    subtab_to_render['active'] = ''
-                subtabs_to_render.append(subtab_to_render)
+        for subtab, subtab_dict in tab_dict['subtabs'].items():
+            if tab == selected_tab and subtab == selected_subtab:
+                processor = subtab_dict['processor']
+                template = subtab_dict['template']
+                tab_to_render['current'] = subtab_dict['text']
 
-        else:
-            tab_to_render['active'] = ''
+            subtab_to_render = {
+                'href': '/{}/{}'.format(tab, subtab),
+                'text': subtab_dict['text'],
+            }
+            subtabs_to_render.append(subtab_to_render)
 
+        tab_to_render['subtabs'] = subtabs_to_render
         tabs_to_render.append(tab_to_render)
 
-    rendered_tabs = render_tabs(
-        dicts_to_kwargs_objs(tabs_to_render),
-        dicts_to_kwargs_objs(subtabs_to_render)
-    )
-    rendered_payload = render_payload(processor)
-
-    return rendered_tabs, rendered_payload
+    return render_tabs(tabs_to_render), render_payload(processor, template)
 
 
-def render_tabs(tabs_to_render, subtabs_to_render):
-    return template(
-        os.path.dirname(__file__) + '/templates/tabs.tpl',
+def render_tabs(tabs_to_render):
+    return render_template(
+        'tabs.html',
         tabs=tabs_to_render,
-        subtabs=subtabs_to_render
     )
 
 
-def render_payload(processor):
-    payload_data = dicts_to_kwargs_objs(processor())
-    template_file = 'stock_cards.tpl'
-
-    return template(
-        os.path.dirname(__file__) + '/templates/' + template_file,
-        data=payload_data,
+def render_payload(processor, template):
+    return render_template(
+        template + '.html',
+        data=processor(),
     )
