@@ -24,10 +24,10 @@ tabs = {
                 'processor': watcher_processor.event,
                 'type': 'card-3'
             },
-            'table': {
-                'text': 'Table',
-                'processor': watcher_processor.event,
-                'type': 'table-3',
+            'history': {
+                'text': 'Hst',
+                'processor': watcher_processor.history,
+                'type': 'card-3',
             },
         },
     },
@@ -66,7 +66,7 @@ def process_tab(selected_tab, selected_subtab):
 
             for subtab, subtab_dict in tab_dict['subtabs'].items():
                 subtab_to_render = {
-                    'href': subtab,
+                    'href': '/{}/{}'.format(tab, subtab),
                     'text': subtab_dict['text'],
                 }
                 if subtab == selected_subtab:

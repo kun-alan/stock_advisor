@@ -17,8 +17,8 @@ def index():
     return home_page('watcher', 'event_cards')
 
 
-@route('/selected_tab>/<selected_subtab>', method='GET')
-def index(selected_tab, selected_subtab):
+@route('/<selected_tab>/<selected_subtab>', method='GET')
+def subtab(selected_tab, selected_subtab):
     return home_page(selected_tab, selected_subtab)
 
 
