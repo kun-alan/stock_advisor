@@ -1,0 +1,27 @@
+<table class="recommender-table mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Price</th>
+            <th colspan="2">Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data %}
+            <tr>
+                <td>{{ row.symbol }}</td>
+                <td>{{ row.date_to_buy }}</td>
+                <td>
+                    {% for key, value in row.details.items() %}
+                        <div class="row">{{ key }}:</div>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for key, value in row.details.items() %}
+                        <div class="row">{{ value }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
